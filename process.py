@@ -61,11 +61,10 @@ with open(sys.argv[3], 'r') as f:
         open('golden.csv', 'w') as wg:
         wwo.write(header + "\n")
         wnew.write(header + "\n")
-
+        w.write(header + "\n")
         wg.write("attack_type\n")
         for line in lines:
             line = process(line)
-            w.write(header + "\n")
             w.write(",".join(line))
             w.write("\n")
             wg.write(line[-1] + "\n")
@@ -75,5 +74,3 @@ with open(sys.argv[3], 'r') as f:
             else:
                 wnew.write(",".join(line))
                 wnew.write("\n")
-
-
