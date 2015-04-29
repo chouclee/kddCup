@@ -31,40 +31,27 @@ header = 'duration,protocol_type,service,flag,src_bytes,dst_bytes,' \
     'dst_host_serror_rate,dst_host_srv_serror_rate,dst_host_rerror_rate,'\
     'dst_host_srv_rerror_rate,attack_type'
 
-with open(sys.argv[1], 'r') as f:
-    lines = f.readlines()
+def process(instance):
+    instance = instance.strip()
+    instance = instance.split(",")
+    instance[1] = toValue(protocol_dict, instance[1])
+    instance[2] = toValue(service_dict, instance[2])
+    instance[3] = toValue(flag_dict, instance[3])
+    instance.pop(-1)
+    instance[-1] = attack_dict.get(instance[-1], instance[-1])
+    return instance
 
-    with open('train.csv', 'w') as w:
+def generateCSV(txt_file, csv_file):
+    with open(txt_file, 'r') as f, open(csv_file, 'w') as w:
+        lines = f.readlines()
         w.write(header + "\n")
         for line in lines:
-            line = line.strip()
-            line = line.split(",")
-            line[1] = toValue(protocol_dict, line[1])
-            line[2] = toValue(service_dict, line[2])
-            line[3] = toValue(flag_dict, line[3])
-            line.pop(-1)
-            line[-1] = attack_dict[line[-1]]
+            line = process(line)
             w.write(",".join(line))
             w.write("\n")
-    w.close()
 
-
-with open(sys.argv[2], 'r') as f:
-    lines = f.readlines()
-
-    with open('train20Percent.csv', 'w') as w:
-        w.write(header + "\n")
-        for line in lines:
-            line = line.strip()
-            line = line.split(",")
-            line[1] = str(protocol_dict[line[1]])
-            line[2] = str(service_dict[line[2]])
-            line[3] = str(flag_dict[line[3]])
-            line.pop(-1)
-            line[-1] = attack_dict[line[-1]]
-            w.write(",".join(line))
-            w.write("\n")
-    w.close()
+generateCSV(sys.argv[1], 'train.csv')
+generateCSV(sys.argv[2], 'train20Percent.csv')
 
 with open(sys.argv[3], 'r') as f:
     lines = f.readlines()
@@ -77,14 +64,7 @@ with open(sys.argv[3], 'r') as f:
 
         wg.write("attack_type\n")
         for line in lines:
-            line = line.strip()
-            line = line.split(",")
-            line[1] = str(protocol_dict[line[1]])
-            line[2] = str(service_dict[line[2]])
-            line[3] = str(flag_dict[line[3]])
-            line.pop(-1)
-            line[-1] = attack_dict.get(line[-1], line[-1])
-
+            line = process(line)
             w.write(header + "\n")
             w.write(",".join(line))
             w.write("\n")
