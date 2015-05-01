@@ -13,6 +13,11 @@ attack_dict = {"back":"dos","buffer_overflow":"u2r","ftp_write":"r2l",
                "pod":"dos","portsweep":"probe","rootkit":"u2r",
                "satan":"probe","smurf":"dos","spy":"r2l","teardrop":"dos",
                "warezclient":"r2l","warezmaster":"r2l","normal":"normal"}
+new_attack_dict = {"saint":"probe","mscan":"probe","apache2":"dos","snmpgetattack":"r2l",
+                   "processtable":"dos","httptunnel":"u2r","ps":"u2r","mailbomb":"dos",
+                   "sendmail":"r2l","named":"r2l","snmpguess":"r2l","xlock":"r2l",
+                   "xsnoop":"r2l","worm":"r2l","sqlattack":"u2r","xterm":"u2r",
+                   "udpstorm":"dos"}
 old_attack = {"dos", "u2r", "r2l", "probe", "normal"}
 
 def toValue(dictionary, s):
@@ -72,5 +77,6 @@ with open(sys.argv[3], 'r') as f:
                 wwo.write(",".join(line))
                 wwo.write("\n")
             else:
+                line[-1] = new_attack_dict[line[-1]]
                 wnew.write(",".join(line))
                 wnew.write("\n")
