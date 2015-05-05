@@ -34,16 +34,23 @@ header = 'duration,protocol_type,service,flag,src_bytes,dst_bytes,' \
     'srv_diff_host_rate,dst_host_count,dst_host_srv_count,dst_host_same_srv_rate,'\
     'dst_host_diff_srv_rate,dst_host_same_src_port_rate,dst_host_srv_diff_host_rate,'\
     'dst_host_serror_rate,dst_host_srv_serror_rate,dst_host_rerror_rate,'\
-    'dst_host_srv_rerror_rate,attack_type'
+    'dst_host_srv_rerror_rate,attack_type,is_normal,nf1,nf2,nf3,nf4'
 
 def process(instance):
     instance = instance.strip()
     instance = instance.split(",")
-    instance[1] = toValue(protocol_dict, instance[1])
-    instance[2] = toValue(service_dict, instance[2])
+    #instance[1] = toValue(protocol_dict, instance[1])
+    #instance[2] = toValue(service_dict, instance[2])
     instance[3] = toValue(flag_dict, instance[3])
-    instance.pop(-1)
-    instance[-1] = attack_dict.get(instance[-1], instance[-1])
+    instance[-2] = attack_dict.get(instance[-2], instance[-2])
+    if instance[-2] != 'normal':
+        instance[-1] = 'abnormal'
+    else:
+        instance[-1] = 'normal'
+    instance.append((instance[10] + instance[11])*10)
+    instance.append(str(instance[6] < 1000 and instance[5] < 1000))
+    instance.append(str(instance[6] < 3000 and instance[5] < 3000))
+    instance.append(instance[3]*10)
     return instance
 
 def generateCSV(txt_file, csv_file):
@@ -72,11 +79,11 @@ with open(sys.argv[3], 'r') as f:
             line = process(line)
             w.write(",".join(line))
             w.write("\n")
-            wg.write(line[-1] + "\n")
-            if line[-1] in old_attack:
+            wg.write(line[-6] + "\n")
+            if line[-6] in old_attack:
                 wwo.write(",".join(line))
                 wwo.write("\n")
             else:
-                line[-1] = new_attack_dict[line[-1]]
+                line[-6] = new_attack_dict[line[-6]]
                 wnew.write(",".join(line))
                 wnew.write("\n")
